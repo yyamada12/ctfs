@@ -1,0 +1,333 @@
+BASEDIR = /usr/local
+#BASEDIR = $(HOME)
+GDBBASEDIR = /home/user/tools
+SUBDIR = cross-gcc494
+#EXECDIR = ../../server/exec
+EXECDIR = /home/user/server/exec
+
+PREFIX = $(BASEDIR)/$(SUBDIR)
+GDBPREFIX = $(GDBBASEDIR)/$(SUBDIR)
+BINDIR = $(PREFIX)/bin
+GDBBINDIR = $(GDBPREFIX)/bin
+
+TARGETS_SIM += arm-elf.d h8300-elf.d mips-elf.d powerpc-elf.d sh-elf.d
+TARGETS_SIM += aarch64-elf.d bfin-elf.d cr16-elf.d m32c-elf.d microblaze-elf.d
+TARGETS_SIM += moxie-elf.d msp430-elf.d rx-elf.d
+TARGETS_SIM += cris-elf.d frv-elf.d m32r-elf.d mcore-elf.d
+TARGETS_SIM += mn10300-elf.d sh64-elf.d v850-elf.d
+TARGETS_SIM += arm16-elf.d mips16-elf.d
+TARGETS_SIM += mips64-elf.d
+#TARGETS_SIM += rl78-elf.d avr-elf.d sparc-elf.d
+
+# native architectures.
+#TARGETS_NATIVE += i386-elf.d
+
+# major architectures.
+#TARGETS_SIM += arm-elf.d h8300-elf.d mips-elf.d powerpc-elf.d sh-elf.d
+
+# available on new gcc.
+#TARGETS_SIM += aarch64-elf.d bfin-elf.d cr16-elf.d m32c-elf.d microblaze-elf.d
+#TARGETS_SIM += moxie-elf.d msp430-elf.d rl78-elf.d rx-elf.d
+
+# other architectures.
+#TARGETS_SIM += avr-elf.d cris-elf.d frv-elf.d m32r-elf.d mcore-elf.d
+#TARGETS_SIM += mn10300-elf.d sh64-elf.d sparc-elf.d v850-elf.d
+
+# use compiler for main architecture.
+#TARGETS_SIM += arm16-elf.d mips16-elf.d
+
+TARGETS = $(TARGETS_NATIVE) $(TARGETS_SIM)
+
+#SRCS = $(TARGETS:.d=.c)
+#ASMS = $(TARGETS:.d=.s)
+ASMS = $(TARGETS:.d=.S)
+OBJS = $(TARGETS:.d=.o)
+EXES = $(TARGETS:.d=.x)
+BINS = $(TARGETS:.d=.bin)
+OUTS = $(TARGETS:.d=.out)
+
+#NOUT = $(TARGETS_NATIVE:.d=.not)
+#SOUT = $(TARGETS_SIM:.d=.sot)
+
+#SOURCE = sample.c
+
+UNAME = `uname -s | sed 's/[\_\-].*//'`
+
+# common options.
+GFLAGS   = -fno-builtin -nostdinc -nostdlib -static -O -Wall
+GFLAGS  += -g
+GFLAGS  += -D___$(UNAME)___
+CFLAGS   = -fverbose-asm
+CFLAGS  += -fomit-frame-pointer
+#CFLAGS += -fno-omit-frame-pointer
+CFLAGS  += -fno-inline
+CFLAGS  += -DARCH=\"$*\"
+AFLAGS   = 
+LFLAGS   = -Wl,-Tld.scr
+#LFLAGS  += lib-$*.S
+DFLAGS   = -d
+#DFLAGS += -S
+XFLAGS   =
+
+FGCC-arm16-elf  = arm16-elf
+TGCC-arm16-elf  = arm-elf
+FGCC-avr8-elf   = avr8-elf
+TGCC-avr8-elf   = avr-elf
+FGCC-h8300h-elf = h8300h-elf
+TGCC-h8300h-elf = h8300-elf
+FGCC-m6811s-elf = m6811s-elf
+TGCC-m6811s-elf = m6811-elf
+FGCC-mips16-elf = mips16-elf
+TGCC-mips16-elf = mips-elf
+
+FGDB-arm16-elf  = arm16-elf
+TGDB-arm16-elf  = arm-elf
+#FGDB-mips64-elf = mips64-elf
+#TGDB-mips64-elf = mips-elf
+
+# general options.
+GFLAGS-arm16-elf       += -mthumb -mthumb-interwork
+GFLAGS-avr8-elf        += -mint8 -w
+GFLAGS-h8300h-elf      += -mh -mint32
+GFLAGS-m32c-elf        += -memregs=0
+GFLAGS-m6811s-elf      += -mshort
+#GFLAGS-m68k-elf       += -mshort
+GFLAGS-mips16-elf      += -mips16
+GFLAGS-mips64-elf      += -mips64 -march=mips64 -mtune=mips64 -mlong64
+GFLAGS-mmix-elf        += -melf
+GFLAGS-msp430-elf      += -mlarge
+#GFLAGS-pdp11-aout     += -mint32
+GFLAGS-powerpc64-linux += -mpowerpc64 -mcpu=powerpc64 -mtune=powerpc64
+GFLAGS-sh64-elf        += -m5-64media
+GFLAGS-x86_64-linux    += -m64
+
+# options without symbols defined on linker script.
+#GFLAGS-avr-elf    += -minit-stack=0xfe1c00
+#GFLAGS-avr8-elf   += -minit-stack=0xfe1c00
+#GFLAGS-frv-elf    += -G 0
+#GFLAGS-hppa-linux += -mfast-indirect-calls
+#GFLAGS-m6811-elf  += -msoft-reg-count=0
+#GFLAGS-m6811s-elf += -msoft-reg-count=0
+#GFLAGS-mips-elf   += -G 0
+#GFLAGS-mips16-elf += -G 0
+#GFLAGS-mips64-elf += -G 0
+#GFLAGS-v850-elf   += -mno-prolog-function
+#GFLAGS-xtensa-elf += -mtext-section-literals
+
+# to avoid debug option.
+NOGFLAGS-h8300-elf  += -g
+NOGFLAGS-h8300h-elf += -g
+NOGFLAGS-i960-elf   += -g
+NOGFLAGS-m6811-elf  += -g
+NOGFLAGS-m6811s-elf += -g
+NOGFLAGS-microblaze-elf += -g
+NOGFLAGS-pdp11-aout += -g
+
+# compile options.
+NOCFLAGS-i386-elf += -fverbose-asm
+CFLAGS-i960-elf   += -DNO_DIRECT
+CFLAGS-ia64-elf   += -DNO_DIRECT -DNO_BINARY
+CFLAGS-mmix-elf   += -DNO_DIRECT
+
+# to use system call wrapper functions.
+CFLAGS-m32r-elf    += -DUSE_SYSCALL_WRAPPER
+CFLAGS-mn10300-elf += -DUSE_SYSCALL_WRAPPER
+CFLAGS-sh-elf      += -DUSE_SYSCALL_WRAPPER
+CFLAGS-sh64-elf    += -DUSE_SYSCALL_WRAPPER
+CFLAGS-v850-elf    += -DUSE_SYSCALL_WRAPPER
+
+# assemble options.
+AFLAGS-arc-elf  += -Wa,-marc5
+AFLAGS-ia64-elf += -mgnu-as
+
+# link options.
+LFLAGS-ia64-elf      += -mgnu-ld
+#LFLAGS-ia64-elf     += -Wl,-r
+#NOLFLAGS-ia64-elf   += -Wl,-Tld.scr
+LFLAGS-rl78-elf      += -Wl,-Ttext -Wl,0x1400
+LFLAGS-rl78-elf      += -Wl,--no-gc-sections
+#LFLAGS-rx-elf        += -N
+LFLAGS-rx-elf        += -N -Wl,-Ttext -Wl,0x1af4
+LFLAGS-spu-elf       += -Wl,-Ttext -Wl,0x1400
+LFLAGS-x86_64-linux  += -Wl,-n
+LFLAGS-xstormy16-elf += -Wl,-Ttext -Wl,0x1400
+
+# disassemble options.
+#DFLAGS-arm-elf    += -M reg-names-raw
+#DFLAGS-arm16-elf  += -M reg-names-raw
+#DFLAGS-mips-elf   += -M reg-names=numeric
+#DFLAGS-mips16-elf += -M reg-names=numeric
+#DFLAGS-mips64-elf += -M reg-names=numeric
+#DFLAGS-mips-elf   += -M no-aliases
+#DFLAGS-mips64-elf += -M no-aliases
+
+# execute options.
+XFLAGS-bfin-elf    += --environment user
+XFLAGS-powerpc-elf += -e linux
+#XFLAGS-rl78-elf   += -r 65536
+XFLAGS-mips64-elf  += --memory-region 0x100000,0x10000
+
+# need to build runnable objects.
+#CFLAGS-avr-elf   += -minit-stack=_estack
+CFLAGS-frv-elf    += -mno-cond-exec
+CFLAGS-m6811-elf  += -DRSHIFT=___lshrsi3
+CFLAGS-msp430-elf += -DRSHIFT=__mspabi_srll_4
+CFLAGS-rl78-elf   += -DRSHIFT=__lshrsi3
+
+# need to build runnable objects. (set text address)
+LFLAGS-avr-elf    += -Wl,--section-start -Wl,.rodata=0x00801800
+LFLAGS-i386-elf   += -Wl,-Ttext -Wl,0x08048400
+LFLAGS-mips-elf   += -Wl,-Ttext -Wl,0x80000000
+LFLAGS-mips16-elf += -Wl,-Ttext -Wl,0x7fff8000
+LFLAGS-mips64-elf += -Wl,-Ttext -Wl,0x100000
+LFLAGS-sparc-elf  += -Wl,-Ttext -Wl,0x02001400
+
+.SUFFIXES:
+#.SUFFIXES: .not .sot .d .x .o .s .c
+#.PRECIOUS: $(SRCS) $(ASMS) $(OBJS) $(EXES)
+.SUFFIXES: .out .bin .d .x .o .S
+.PRECIOUS: $(OBJS) $(EXES) $(BINS) $(OUTS)
+
+all :		target bin
+
+#$(SRCS) :	$(SOURCE)
+#		@echo ---------------- $* ----------------
+#		@echo ---- create source file \($(SOURCE) =\> $@\)
+#		cp $(SOURCE) $@
+
+#$(ASMS) :	Makefile syscall.h
+$(ASMS) :	Makefile
+
+#$(EXES) :	ld.scr lib-*.S
+$(EXES) :	ld.scr
+
+#.c.s :
+#		@echo ---- compile \($< =\> $@\)
+#		$(BINDIR)/$(*:$(FGCC-$*)=$(TGCC-$*))-gcc \
+#			$(GFLAGS:$(NOGFLAGS-$*)=) $(GFLAGS-$*) \
+#			$(CFLAGS:$(NOCFLAGS-$*)=) $(CFLAGS-$*) -o $@ -S $<
+
+#.s.o :
+.S.o :
+		@echo ---- assemble \($< =\> $@\)
+		$(BINDIR)/$(*:$(FGCC-$*)=$(TGCC-$*))-gcc \
+			$(GFLAGS:$(NOGFLAGS-$*)=) $(GFLAGS-$*) \
+			$(AFLAGS:$(NOAFLAGS-$*)=) $(AFLAGS-$*) -o $@ -c $<
+
+.o.x :
+		@echo ---- link \($< =\> $@\)
+		$(BINDIR)/$(*:$(FGCC-$*)=$(TGCC-$*))-gcc \
+			$(GFLAGS:$(NOGFLAGS-$*)=) $(GFLAGS-$*) \
+			$(LFLAGS:$(NOLFLAGS-$*)=) $(LFLAGS-$*) -o $@ $<
+
+.x.d :
+		@echo ---- disassemble \($< =\> $@\)
+		$(BINDIR)/$(*:$(FGCC-$*)=$(TGCC-$*))-objdump \
+			$(DFLAGS:$(NODFLAGS-$*)=) $(DFLAGS-$*) $< > $@
+
+#.x.sot :
+#		@echo ---- simulate \($< =\> $@\)
+#		$(GDBBINDIR)/$(*:$(FGDB-$*)=$(TGDB-$*))-run \
+#			$(XFLAGS:$(NOXFLAGS-$*)=) $(XFLAGS-$*) $< > $@
+#		@cat $@
+
+#m6811-elf.sot :	m6811-elf.x
+#		@echo ---- simulate \($< =\> $@\)
+#		$(GDBBINDIR)/$(*:$(FGDB-$*)=$(TGDB-$*))-run \
+#			$(XFLAGS:$(NOXFLAGS-$*)=) $(XFLAGS-$*) $< > $@ 0>&1
+#		@cat $@
+
+#microblaze-elf.sot :	microblaze-elf.x
+#		@echo ---- simulate \($< =\> $@\)
+#		$(GDBBINDIR)/$(*:$(FGDB-$*)=$(TGDB-$*))-gdb \
+#			$(XFLAGS:$(NOXFLAGS-$*)=) $(XFLAGS-$*) $< \
+#			-x cmd-$*.txt \
+#			| grep Hello | perl -pe 's/.*\"(.*)\\n\".*/$$1/' > $@
+#		@cat $@
+
+#sparc-elf.sot :	sparc-elf.x
+#		@echo ---- simulate \($< =\> $@\)
+#		$(GDBBINDIR)/$(*:$(FGDB-$*)=$(TGDB-$*))-run \
+#			$(XFLAGS:$(NOXFLAGS-$*)=) $(XFLAGS-$*) $< \
+#			-c cmd-$*.txt \
+#			| grep Hello > $@
+#		@cat $@
+
+#.x.not :
+#		@echo ---- execute \($< =\> $@\)
+#		$(BINDIR)/$(*:$(FGCC-$*)=$(TGCC-$*))-elfedit \
+#			--output-osabi $(UNAME) $<
+#		./$< > $@
+#		@cat $@
+
+#.x.bin :
+#		@echo ---- binary \($< =\> $@\)
+#		$(BINDIR)/$(*:$(FGCC-$*)=$(TGCC-$*))-objcopy \
+#			$(BFLAGS:$(NOBFLAGS-$*)=) $(BFLAGS-$*) -O binary $< $@
+
+.x.bin :
+		@echo ---- binary \($< =\> $@\)
+		cat $< | ./cut.pl $< _start _code_end > $@
+		cat enter.bin >> $@
+
+.bin.out :
+		@echo ---- simulate \($< =\> $@\)
+		cat $< | \
+		$(GDBBINDIR)/$(*:$(FGDB-$*)=$(TGDB-$*))-run \
+			$(XFLAGS:$(NOXFLAGS-$*)=) $(XFLAGS-$*) \
+			$(EXECDIR)/$*.x > $@
+		cat $@
+
+# clear default .c.o rule
+# (useless because of priority definition of .SUFFIXES)
+
+# for BSD make
+.c.o :
+
+# for GNU make
+%.o :		%.c
+
+obj :		$(OBJS)
+
+exe :		$(EXES)
+
+target :	$(TARGETS)
+
+disas :		target
+
+bin :		$(BINS)
+
+#run-native :	$(NOUT)
+
+#run-sim :	$(SOUT)
+
+#run :		run-native run-sim
+
+out :		$(OUTS)
+
+run :		out
+
+clean-obj :
+		rm -f $(OBJS)
+
+clean-exe :
+		rm -f $(EXES)
+
+clean-target :
+		rm -f $(TARGETS)
+
+clean-disas :	clean-target
+
+clean-bin :
+		rm -f $(BINS)
+
+clean-all :	clean-obj clean-exe clean-target clean-bin
+
+clean-out :
+		rm -f $(OUTS)
+		rm -f data.bin
+
+clean-run :	clean-out
+
+clean :		clean-all clean-run
+#		rm -f $(SRCS) $(ASMS) $(OBJS) $(EXES) $(TARGETS) $(NOUT) $(SOUT)
